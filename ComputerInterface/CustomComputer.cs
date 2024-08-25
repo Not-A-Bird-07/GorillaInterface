@@ -266,7 +266,8 @@ namespace ComputerInterface
 
         private async void PrepareMonitor(Scene scene, string computerPath)
         {
-            GameObject physicalComputer = GameObject.Find(computerPath);
+            scene.TryFindByPath(computerPath, out Transform computer);
+            GameObject physicalComputer = computer.gameObject;
 
             try
             {
