@@ -35,25 +35,23 @@ namespace ComputerInterface.Views.GameSettings
         public void OnJoinedRoom() => roomView.Redraw(useTemporaryState: true, temporaryState: NetSystemState.InGame);
         public void OnLeftRoom() => roomView.Redraw(useTemporaryState: true, temporaryState: NetSystemState.Idle);
 
-        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {}
 
-        }
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {}
+
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {}
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        {
-
-        }
+        {}
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
-        {
-
-        }
+        {}
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-        {
-
-        }
+        {}
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
@@ -63,6 +61,11 @@ namespace ComputerInterface.Views.GameSettings
         public void OnConnectedToServer(NetworkRunner runner)
         {
             roomView.Redraw(useTemporaryState: true, temporaryState: NetSystemState.Idle);
+        }
+
+        public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+        {
+            
         }
 
         public void OnDisconnectedFromServer(NetworkRunner runner)
@@ -98,6 +101,16 @@ namespace ComputerInterface.Views.GameSettings
         public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
         {
             roomView.Redraw(useTemporaryState: true, temporaryState: NetSystemState.Idle);
+        }
+
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+        {
+            
+        }
+
+        public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+        {
+            
         }
 
         public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)

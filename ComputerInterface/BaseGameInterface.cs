@@ -109,9 +109,9 @@ namespace ComputerInterface
 
         public static void SetColor(float r, float g, float b)
         {
-            PlayerPrefs.SetFloat("redValue", Mathf.Clamp01(r));
-            PlayerPrefs.SetFloat("greenValue", Mathf.Clamp01(g));
-            PlayerPrefs.SetFloat("blueValue", Mathf.Clamp01(b));
+            PlayerPrefs.SetFloat("redValue", r);
+            PlayerPrefs.SetFloat("greenValue", g);
+            PlayerPrefs.SetFloat("blueValue",b);
 
             GorillaTagger.Instance.UpdateColor(r, g, b);
             PlayerPrefs.Save();
@@ -122,9 +122,9 @@ namespace ComputerInterface
 
         public static void GetColor(out float r, out float g, out float b)
         {
-            r = Mathf.Clamp01(PlayerPrefs.GetFloat("redValue"));
-            g = Mathf.Clamp01(PlayerPrefs.GetFloat("greenValue"));
-            b = Mathf.Clamp01(PlayerPrefs.GetFloat("blueValue"));
+            r = PlayerPrefs.GetFloat("redValue");
+            g = PlayerPrefs.GetFloat("greenValue");
+            b = PlayerPrefs.GetFloat("blueValue");
         }
 
         public static Color GetColor()
@@ -138,7 +138,7 @@ namespace ComputerInterface
         private static void InitializeNoobMaterial(Color color)
         {
             if (NetworkSystem.Instance.InRoom)
-                GorillaTagger.Instance.myVRRig.RPC("InitializeNoobMaterial", RpcTarget.All, color.r, color.g, color.b);
+                GorillaTagger.Instance.myVRRig.SendRPC("InitializeNoobMaterial", RpcTarget.All, color.r, color.g, color.b);
         }
 
         #endregion

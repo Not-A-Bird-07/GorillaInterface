@@ -90,14 +90,14 @@ namespace ComputerInterface
 
             _computerPathDictionary = new()
             {
-                { "GorillaTag", "Environment Objects/LocalObjects_Prefab/TreeRoom/TreeRoomInteractables/GorillaComputerObject/ComputerUI" },
+                { "GorillaTag", "Environment Objects/LocalObjects_Prefab/TreeRoom/TreeRoomInteractables/GorillaComputerObject/ComputerUI" }, // there is also 'Environment Objects/MonkeBlocksRoomPersistent/MonkeBlocksComputer/GorillaComputerObject/ComputerUI' in the scene
                 { "Mountain", "Mountain/Geometry/goodigloo/GorillaComputerObject/ComputerUI" },
                 { "Skyjungle", "skyjungle/UI/GorillaComputerObject/ComputerUI" },
                 { "Basement", "Basement/DungeonRoomAnchor/BasementComputer/GorillaComputerObject/ComputerUI" },
-                { "Beach", "Beach/BeachComputer/GorillaComputerObject/ComputerUI" },
-                { "Rotating", "RotatingMap/DO-NOT-TOUCH/UI (1)/-- Rotating PhysicalComputer UI --" },
+                { "Beach", "Beach/BeachComputer (1)/GorillaComputerObject/ComputerUI" },
+                { "Rotating", "RotatingPermanentEntrance/UI (1)/GorillaComputerObject/ComputerUI" },
                 { "Metropolis", "MetroMain/ComputerArea/GorillaComputerObject/ComputerUI" },
-                { "Attic", "AtticRoomAttic/AtticComputer/GorillaComputerObject/ComputerUI" }
+                { "Cave", "Cave_Main_Prefab/NewCave/CaveComputer/GorillaComputerObject/ComputerUI" } // there is also 'Cave_Main_Prefab/OldCave/CaveComputer/GorillaComputerObject/ComputerUI' in the same scene but idc
             };
             PrepareMonitor(SceneManager.GetActiveScene(), _computerPathDictionary["GorillaTag"]);
 
@@ -310,7 +310,7 @@ namespace ComputerInterface
                     button.GetComponentInChildren<MeshFilter>().mesh = CubeMesh;
                     button.transform.localPosition -= new Vector3(0, 0.6f, 0);
                     DestroyImmediate(button.GetComponent<BoxCollider>());
-                    if (FindText(button.gameObject, button.name + "text")?.GetComponent<Text>() is Text arrowBtnText)
+                    if (FindText(button.gameObject, button.name + "text")?.GetComponent<TextMeshPro>() is TextMeshPro arrowBtnText)
                     {
                         DestroyImmediate(arrowBtnText);
                     }
@@ -319,7 +319,7 @@ namespace ComputerInterface
 
                 if (!nameToEnum.TryGetValue(button.characterString.ToLower(), out EKeyboardKey key)) continue;
 
-                if (FindText(button.gameObject) is Text buttonText)
+                if (FindText(button.gameObject) is TextMeshPro buttonText)
                 {
                     CustomKeyboardKey customButton = button.gameObject.AddComponent<CustomKeyboardKey>();
                     customButton.pressTime = button.pressTime;
@@ -362,10 +362,10 @@ namespace ComputerInterface
             upKeyText.localEulerAngles += new Vector3(0, 0, 90);
         }
 
-        private static Text FindText(GameObject button, string name = null)
+        private static TextMeshPro FindText(GameObject button, string name = null)
         {
-            //Debug.Log($"Replacing key {button.name} / {name}");
-            if (button.GetComponent<Text>() is Text text)
+            //Debug.Log($"Replacing key {button.GetPath()} / {name}");
+            if (button.GetComponent<TextMeshPro>() is TextMeshPro text)
             {
                 return text;
             }
@@ -381,10 +381,10 @@ namespace ComputerInterface
             }
 
             // Forest
-            Transform t = button.transform.parent?.parent?.Find("Text/" + name);
+            Transform t = button.transform.parent?.parent?.parent?.parent?.parent?.parent?.parent?.Find(name);
 
             // Mountain
-            t ??= button.transform?.parent?.parent?.parent?.parent?.parent?.parent?.parent?.Find("UI/Text/" + name);
+            t ??= button.transform.parent?.parent?.parent?.parent?.parent?.parent?.parent?.Find("UI/Text/" + name);
             t ??= button.transform.parent?.parent?.Find("Text/" + name + " (1)");
 
             // Clouds
@@ -396,19 +396,12 @@ namespace ComputerInterface
             t ??= button.transform.parent?.parent?.Find("Text/" + name + " (1)");
 
             // Beach
-            t ??= button.transform.parent?.parent?.parent?.parent?.parent?.Find("UI FOR BEACH COMPUTER/Text/" + name);
-
-            // Rotating
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name);
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name + " (1)");
+            t ??= button.transform.parent?.parent?.Find("Text/" + name);
 
             // Metropolis
             t ??= button.transform.parent?.parent?.Find("Text/" + name);
 
-            // Attic
-            t ??= button.transform.parent?.parent?.Find("Text/" + name);
-
-            return t.GetComponent<Text>();
+            return t.GetComponentInParent<TextMeshPro>();
         }
 
         private CustomKeyboardKey CreateKey(GameObject prefab, string goName, Vector3 offset, EKeyboardKey key,
@@ -419,8 +412,8 @@ namespace ComputerInterface
             newKey.transform.localPosition += offset;
             newKey.GetComponent<MeshFilter>().mesh = CubeMesh;
 
-            Text keyText = FindText(prefab, prefab.name);
-            Text newKeyText = Instantiate(keyText.gameObject, keyText.gameObject.transform.parent).GetComponent<Text>();
+            TextMeshPro keyText = FindText(prefab, prefab.name);
+            TextMeshPro newKeyText = Instantiate(keyText.gameObject, keyText.gameObject.transform.parent).GetComponent<TextMeshPro>();
             newKeyText.name = goName;
             newKeyText.transform.localPosition += offset;
 
@@ -472,6 +465,12 @@ namespace ComputerInterface
         private void RemoveMonitor(GameObject computer, string sceneName)
         {
             GameObject monitor = null;
+
+            if (sceneName == "GorillaTag")
+            {
+                GameObject.Find("Environment Objects/LocalObjects_Prefab/TreeRoom/FunctionSelect").SetActive(false);
+                GameObject.Find("Environment Objects/LocalObjects_Prefab/TreeRoom/Data").SetActive(false);
+            }
             foreach (Transform child in computer.transform)
             {
                 if (child.name.StartsWith("monitor"))

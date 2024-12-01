@@ -45,7 +45,7 @@ namespace ComputerInterface.Views.GameSettings
                 return;
             }
 
-            str.Append("Player ID: ").Append(PlayFabAuthenticator.instance._playFabPlayerIdCache).AppendLine();
+            str.Append("Player ID: ").Append(PlayFabAuthenticator.instance.GetPlayFabPlayerId()).AppendLine();
             str.Append("Platform: ").Append("Steam").AppendLines(2);
             str.Append("Version: ").Append(GorillaComputer.instance.GetField<string>("version")).AppendLine();
             str.Append("Build Date: ").Append(GorillaComputer.instance.GetField<string>("buildDate")).AppendLine();
