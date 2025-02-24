@@ -134,7 +134,10 @@ namespace ComputerInterface.Views
             switch (key)
             {
                 case EKeyboardKey.Option1:
-                    BaseGameInterface.Disconnect();
+                    if (NetworkSystem.Instance.InRoom)
+                    {
+                        BaseGameInterface.Disconnect();
+                    }
                     break;
             }
         }

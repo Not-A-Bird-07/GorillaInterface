@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.UI;
-using TMPro;
 
 namespace ComputerInterface
 {
@@ -75,6 +74,10 @@ namespace ComputerInterface
             }
             */
 
+            if (collider != null && !collider.enabled)
+            {
+                collider.enabled = true;
+            }
             enabled = true;
         }
 

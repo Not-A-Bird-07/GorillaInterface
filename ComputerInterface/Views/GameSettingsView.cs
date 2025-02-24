@@ -33,7 +33,9 @@ namespace ComputerInterface.Views
                 new("Queue  ", typeof(QueueView)),
                 new("Group  ", typeof(GroupView)),
                 new("Voice  ", typeof(VoiceSettingsView)),
+                new("Automod", typeof(AutomodView)),
                 new("Items  ", typeof(ItemSettingsView)),
+                new("Redeem ", typeof(RedemptionView)),
                 new("Credits", typeof(CreditsView)),
                 new("Support", typeof(SupportView)),
             };
@@ -72,6 +74,12 @@ namespace ComputerInterface.Views
                 str.Append(_selectionHandler.GetIndicatedText(idx, lineIdx, entry.Item1));
                 str.AppendLine();
             });
+
+            for (int i = 0; i < _pageHandler.EntriesPerPage - _pageHandler.ItemsOnScreen; i++)
+            {
+                str.AppendLine();
+            }
+            str.Append($"<color=#ffffff50><align=\"center\"><  {_pageHandler.CurrentPage + 1}/{_pageHandler.MaxPage + 1}  ></align></color>");
 
             Text = str.ToString();
         }

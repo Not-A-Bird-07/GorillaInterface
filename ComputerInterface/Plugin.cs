@@ -31,5 +31,4 @@ namespace ComputerInterface
             Loaded = true;
         }
     }
-
 }

@@ -12,7 +12,7 @@ namespace ComputerInterface.Views.GameSettings
 
         int MaxPage => (int)totalPages.GetValue(creditsView);
         PropertyInfo totalPages;
-
+        
         MethodInfo getPage;
 
         public override void OnShow(object[] args)
