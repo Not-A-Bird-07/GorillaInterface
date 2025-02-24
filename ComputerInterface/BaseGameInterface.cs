@@ -1,11 +1,13 @@
-using BepInEx;
 using ComputerInterface.Extensions;
 using ComputerInterface.Interfaces;
 using GorillaNetworking;
+using GorillaTagScripts;
+using GorillaTagScripts.ModIO;
 using HarmonyLib;
 using Photon.Pun;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -15,6 +17,7 @@ namespace ComputerInterface
     {
         public const int MAX_ROOM_LENGTH = 10;
         public const int MAX_NAME_LENGTH = 12;
+        public const int MAX_CODE_LENGTH = 8; // Not fully sure if any other codes are 8+ characters. Please change the length if they are. -DecalFree
 
         // WordCheckResult (enum), WordCheckResultToMessage, WordAllowed
         #region Word Checking
@@ -55,19 +58,40 @@ namespace ComputerInterface
         // Disconnect, JoinRoom, GetRoomCode
         #region Room settings
 
-        public static WordCheckResult JoinRoom(string roomId, JoinType joinType = JoinType.Solo)
+        public static WordCheckResult JoinRoom(string roomId)
         {
+            if (!CheckForComputer(out GorillaComputer computer)) return WordCheckResult.ComputerNotFound;
+
             WordCheckResult roomAllowed = WordAllowed(roomId);
 
             if (roomAllowed == WordCheckResult.Allowed)
             {
-                PhotonNetworkController.Instance.AttemptToJoinSpecificRoom(roomId, joinType);
+                if (FriendshipGroupDetection.Instance.IsInParty && !FriendshipGroupDetection.Instance.IsPartyWithinCollider(computer.friendJoinCollider))
+                {
+                    FriendshipGroupDetection.Instance.LeaveParty();
+                }
+
+                if (computer.IsPlayerInVirtualStump())
+                {
+                    CustomMapManager.UnloadMod(false);
+                }
+
+                PhotonNetworkController.Instance.AttemptToJoinSpecificRoom(roomId, FriendshipGroupDetection.Instance.IsInParty ? JoinType.JoinWithParty : JoinType.Solo);
             }
 
             return roomAllowed;
         }
 
-        public static void Disconnect() => NetworkSystem.Instance.ReturnToSinglePlayer();
+        public static async void Disconnect()
+        {
+            if (FriendshipGroupDetection.Instance.IsInParty)
+            {
+                FriendshipGroupDetection.Instance.LeaveParty();
+                await Task.Delay(1000);
+            }
+
+            await NetworkSystem.Instance.ReturnToSinglePlayer();
+        }
 
         public static string GetRoomCode() => NetworkSystem.Instance.InRoom ? NetworkSystem.Instance.RoomName : null;
 
@@ -89,8 +113,10 @@ namespace ComputerInterface
 
                 computer.currentName = name;
                 NetworkSystem.Instance.SetMyNickName(computer.currentName);
+                ModIOMapsTerminal.RequestDriverNickNameRefresh();
 
-                computer.offlineVRRigNametagText.text = name;
+                computer.InvokeMethod("SetNameTagText", name);
+
                 computer.savedName = name;
                 PlayerPrefs.SetString("playerName", name);
                 PlayerPrefs.Save();
@@ -138,7 +164,7 @@ namespace ComputerInterface
         private static void InitializeNoobMaterial(Color color)
         {
             if (NetworkSystem.Instance.InRoom)
-                GorillaTagger.Instance.myVRRig.RPC("InitializeNoobMaterial", RpcTarget.All, color.r, color.g, color.b);
+                GorillaTagger.Instance.myVRRig.SendRPC("RPC_InitializeNoobMaterial", RpcTarget.All, color.r, color.g, color.b);
         }
 
         #endregion
@@ -163,7 +189,7 @@ namespace ComputerInterface
         {
             string turnMode = PlayerPrefs.GetString("stickTurning");
             if (turnMode.IsNullOrWhiteSpace()) return ETurnMode.None;
-            return (ETurnMode)Enum.Parse(typeof(ETurnMode), string.Concat(turnMode.ToUpper()[1], turnMode.ToLower()[1..]));
+            return (ETurnMode)Enum.Parse(typeof(ETurnMode), string.Concat(turnMode.ToUpper()[0], turnMode.ToLower()[1..]));
         }
 
         public static void SetTurnValue(int value)
@@ -205,6 +231,25 @@ namespace ComputerInterface
         }
 
         public static bool GetItemMode() => PlayerPrefs.GetString("disableParticles") == "TRUE";
+
+        #endregion
+
+        // SetRedemptionStatus, GetRedemptionStatus
+        #region Redemption settings
+
+        public static void SetRedemptionStatus(GorillaComputer.RedemptionResult newStatus)
+        {
+            if (!CheckForComputer(out GorillaComputer computer)) return;
+
+            computer.RedemptionStatus = newStatus;
+        }
+
+        public static GorillaComputer.RedemptionResult GetRedemptionStatus()
+        {
+            if (!CheckForComputer(out GorillaComputer computer)) return GorillaComputer.RedemptionResult.Empty;
+
+            return computer.RedemptionStatus;
+        }
 
         #endregion
 
@@ -258,6 +303,29 @@ namespace ComputerInterface
 
         #endregion
 
+        // SetAutomodMode, GetAutomodMode
+        #region Automod settings
+
+        public static void SetAutomodMode(int value)
+        {
+            if (!CheckForComputer(out GorillaComputer computer)) return;
+
+            EAutomodMode automodModeString = (EAutomodMode)value;
+            computer.SetField("autoMuteType", automodModeString.ToString().ToUpper());
+
+            PlayerPrefs.SetInt("autoMute", (int)automodModeString);
+            PlayerPrefs.Save();
+
+            RigContainer.RefreshAllRigVoices();
+        }
+
+        public static EAutomodMode GetAutomodMode()
+        {
+            return (EAutomodMode)PlayerPrefs.GetInt("autoMute", 1);
+        }
+
+        #endregion
+
         // JoinGroupMap, GetGroupJoinMaps
         #region Group settings
 
@@ -292,12 +360,18 @@ namespace ComputerInterface
         // SetQueue, GetQueue, AllowedInCompetitive
         #region Queue settings
 
-        public static void SetQueue(IQueueInfo queue)
+        public static void SetQueue(IQueueInfo queue, bool isTroopQueue = false)
         {
+            if (!CheckForComputer(out GorillaComputer computer)) return;
+
             if (queue.QueueName == "COMPETITIVE" && !AllowedInCompetitive()) return;
 
             GorillaComputer.instance.currentQueue = queue.QueueName;
+            computer.troopQueueActive = isTroopQueue;
+            computer.SetField("currentTroopPopulation", -1);
             PlayerPrefs.SetString("currentQueue", queue.QueueName);
+            PlayerPrefs.SetInt("troopQueueActive", computer.troopQueueActive ? 1 : 0);
+            PlayerPrefs.Save();
         }
 
         public static string GetQueue() => PlayerPrefs.GetString("currentQueue", "DEFAULT");
@@ -342,9 +416,19 @@ namespace ComputerInterface
             SetVoiceMode(GetVoiceMode());
         }
 
+        public static void InitAutomodMode()
+        {
+            SetAutomodMode((int)GetAutomodMode());
+        }
+
         public static void InitItemMode()
         {
             SetItemMode(GetItemMode());
+        }
+
+        public static void InitRedemptionStatus()
+        {
+            SetRedemptionStatus(GorillaComputer.RedemptionResult.Empty);
         }
 
         public static void InitSupportMode()
@@ -359,7 +443,9 @@ namespace ComputerInterface
             InitTurnState();
             InitMicState();
             InitVoiceMode();
+            InitAutomodMode();
             InitItemMode();
+            InitRedemptionStatus();
             InitSupportMode();
 
             if (CheckForComputer(out GorillaComputer computer))
@@ -394,6 +480,13 @@ namespace ComputerInterface
             AllChat,
             PushToTalk,
             PushToMute
+        }
+
+        public enum EAutomodMode
+        {
+            Off,
+            Moderate,
+            Aggressive
         }
     }
 }

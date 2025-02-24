@@ -49,7 +49,7 @@ namespace ComputerInterface.Commands
             // disconnects from the current room
             _commandHandler.AddCommand(new Command("leave", null, args =>
             {
-                if (PhotonNetwork.InRoom)
+                if (NetworkSystem.Instance.InRoom)
                 {
                     BaseGameInterface.Disconnect();
                     return "Left room!";

@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.UI;
 
 namespace ComputerInterface
 {
@@ -20,7 +20,7 @@ namespace ComputerInterface
         private static Dictionary<EKeyboardKey, Key> _keyMap;
 
         public EKeyboardKey KeyboardKey { get; private set; }
-        public Text KeyboardText { get; private set; }
+        public TextMeshPro KeyboardText { get; private set; }
 
         public float pressTime;
 
@@ -55,7 +55,7 @@ namespace ComputerInterface
             _keyHandler?.Fetch();
         }
 
-        public void Init(CustomComputer computer, EKeyboardKey key, Text keyboardText = null)
+        public void Init(CustomComputer computer, EKeyboardKey key, TextMeshPro keyboardText = null)
         {
             _computer = computer;
             KeyboardKey = key;
@@ -74,10 +74,14 @@ namespace ComputerInterface
             }
             */
 
+            if (collider != null && !collider.enabled)
+            {
+                collider.enabled = true;
+            }
             enabled = true;
         }
 
-        public void Init(CustomComputer computer, EKeyboardKey key, Text keyboardText, string text)
+        public void Init(CustomComputer computer, EKeyboardKey key, TextMeshPro keyboardText, string text)
         {
             Init(computer, key, keyboardText);
             if (keyboardText != null)
@@ -86,7 +90,7 @@ namespace ComputerInterface
             }
         }
 
-        public void Init(CustomComputer computer, EKeyboardKey key, Text keyboardText, string text, Color buttonColor)
+        public void Init(CustomComputer computer, EKeyboardKey key, TextMeshPro keyboardText, string text, Color buttonColor)
         {
             Init(computer, key, keyboardText, text);
 

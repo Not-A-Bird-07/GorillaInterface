@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Bootstrap;
+﻿using BepInEx.Bootstrap;
 using ComputerInterface.Extensions;
 using ComputerInterface.Interfaces;
 using ComputerInterface.ViewLib;
@@ -94,10 +93,13 @@ namespace ComputerInterface
                 { "Mountain", "Mountain/Geometry/goodigloo/GorillaComputerObject/ComputerUI" },
                 { "Skyjungle", "skyjungle/UI/GorillaComputerObject/ComputerUI" },
                 { "Basement", "Basement/DungeonRoomAnchor/BasementComputer/GorillaComputerObject/ComputerUI" },
-                { "Beach", "Beach/BeachComputer/GorillaComputerObject/ComputerUI" },
-                { "Rotating", "RotatingMap/DO-NOT-TOUCH/UI (1)/-- Rotating PhysicalComputer UI --" },
+                { "Beach", "Beach/BeachComputer (1)/GorillaComputerObject/ComputerUI" },
+                { "Rotating", "RotatingPermanentEntrance/UI (1)/GorillaComputerObject/ComputerUI" },
                 { "Metropolis", "MetroMain/ComputerArea/GorillaComputerObject/ComputerUI" },
-                { "Attic", "AtticRoomAttic/AtticComputer/GorillaComputerObject/ComputerUI" }
+                { "Bayou", "BayouMain/ComputerArea/GorillaComputerObject/ComputerUI" },
+                { "Cave", "Cave_Main_Prefab/NewCave/CaveComputer/GorillaComputerObject/ComputerUI" },
+                { "Arena", "ArenaComputerRoom/UI/GorillaComputerObject/ComputerUI" },
+                { "Hoverboard", "HoverboardLevel/UI (1)/GorillaComputerObject/ComputerUI" }
             };
             PrepareMonitor(SceneManager.GetActiveScene(), _computerPathDictionary["GorillaTag"]);
 
@@ -175,6 +177,15 @@ namespace ComputerInterface
             if (loadMode == LoadSceneMode.Additive && _computerPathDictionary.TryGetValue(sceneName, out string computerPath))
             {
                 PrepareMonitor(scene, string.IsNullOrEmpty(computerPath) ? scene.GetComponentInHierarchy<GorillaComputerTerminal>(true).gameObject.GetPath()[1..] : computerPath);
+
+                if (sceneName == "Cave")
+                {
+                    PrepareMonitor(scene, "Cave_Main_Prefab/OldCave/MinesComputer/GorillaComputerObject/ComputerUI");
+                }
+            }
+            else if (loadMode == LoadSceneMode.Additive && ZoneManagement.IsInZone(GTZone.monkeBlocks))
+            {
+                PrepareMonitor(SceneManager.GetSceneByName("GorillaTag"), "Environment Objects/MonkeBlocksRoomPersistent/MonkeBlocksComputer/GorillaComputerObject/ComputerUI");
             }
         }
 
@@ -310,7 +321,7 @@ namespace ComputerInterface
                     button.GetComponentInChildren<MeshFilter>().mesh = CubeMesh;
                     button.transform.localPosition -= new Vector3(0, 0.6f, 0);
                     DestroyImmediate(button.GetComponent<BoxCollider>());
-                    if (FindText(button.gameObject, button.name + "text")?.GetComponent<Text>() is Text arrowBtnText)
+                    if (FindText(button.gameObject, button.name + "text")?.GetComponent<TextMeshPro>() is TextMeshPro arrowBtnText)
                     {
                         DestroyImmediate(arrowBtnText);
                     }
@@ -319,7 +330,7 @@ namespace ComputerInterface
 
                 if (!nameToEnum.TryGetValue(button.characterString.ToLower(), out EKeyboardKey key)) continue;
 
-                if (FindText(button.gameObject) is Text buttonText)
+                if (FindText(button.gameObject) is TextMeshPro buttonText)
                 {
                     CustomKeyboardKey customButton = button.gameObject.AddComponent<CustomKeyboardKey>();
                     customButton.pressTime = button.pressTime;
@@ -354,18 +365,18 @@ namespace ComputerInterface
             CustomKeyboardKey upKey = CreateKey(downKey.gameObject, "Up", new Vector3(-2.3f, 0, 0), EKeyboardKey.Up, ">", arrowColourExists ? arrowKeyButtonColor : Color.white);
 
             Transform downKeyText = FindText(downKey.gameObject).transform;
-            downKeyText.localPosition += new Vector3(0, 0, 0.15f);
+            downKeyText.localPosition -= new Vector3(0, 0, 0.05f);
             downKeyText.localEulerAngles += new Vector3(0, 0, -90);
 
             Transform upKeyText = FindText(upKey.gameObject).transform;
-            upKeyText.localPosition += new Vector3(0.15f, 0, 0.05f);
+            upKeyText.localPosition += new Vector3(0, 0, 0.05f);
             upKeyText.localEulerAngles += new Vector3(0, 0, 90);
         }
 
-        private static Text FindText(GameObject button, string name = null)
+        private static TextMeshPro FindText(GameObject button, string name = null)
         {
             //Debug.Log($"Replacing key {button.name} / {name}");
-            if (button.GetComponent<Text>() is Text text)
+            if (button.GetComponent<TextMeshPro>() is TextMeshPro text)
             {
                 return text;
             }
@@ -381,34 +392,12 @@ namespace ComputerInterface
             }
 
             // Forest
-            Transform t = button.transform.parent?.parent?.Find("Text/" + name);
+            Transform t = button.transform.parent?.parent?.parent?.parent?.parent?.parent?.parent?.Find(name);
 
-            // Mountain
-            t ??= button.transform?.parent?.parent?.parent?.parent?.parent?.parent?.parent?.Find("UI/Text/" + name);
-            t ??= button.transform.parent?.parent?.Find("Text/" + name + " (1)");
-
-            // Clouds
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name);
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name + " (1)");
-
-            // Basement
-            t ??= button.transform?.parent?.parent?.parent?.parent?.parent?.Find("UI FOR BASEMENT/Text/" + name);
-            t ??= button.transform.parent?.parent?.Find("Text/" + name + " (1)");
-
-            // Beach
-            t ??= button.transform.parent?.parent?.parent?.parent?.parent?.Find("UI FOR BEACH COMPUTER/Text/" + name);
-
-            // Rotating
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name);
-            t ??= button.transform.parent?.parent?.parent?.parent?.Find("KeyboardUI/" + name + " (1)");
-
-            // Metropolis
+            // Other Maps
             t ??= button.transform.parent?.parent?.Find("Text/" + name);
 
-            // Attic
-            t ??= button.transform.parent?.parent?.Find("Text/" + name);
-
-            return t.GetComponent<Text>();
+            return t.GetComponent<TextMeshPro>();
         }
 
         private CustomKeyboardKey CreateKey(GameObject prefab, string goName, Vector3 offset, EKeyboardKey key,
@@ -418,9 +407,10 @@ namespace ComputerInterface
             newKey.name = goName;
             newKey.transform.localPosition += offset;
             newKey.GetComponent<MeshFilter>().mesh = CubeMesh;
+            newKey.GetComponent<Collider>().enabled = true;
 
-            Text keyText = FindText(prefab, prefab.name);
-            Text newKeyText = Instantiate(keyText.gameObject, keyText.gameObject.transform.parent).GetComponent<Text>();
+            TextMeshPro keyText = FindText(prefab, prefab.name);
+            TextMeshPro newKeyText = Instantiate(keyText.gameObject, keyText.gameObject.transform.parent).GetComponent<TextMeshPro>();
             newKeyText.name = goName;
             newKeyText.transform.localPosition += offset;
 
@@ -472,6 +462,13 @@ namespace ComputerInterface
         private void RemoveMonitor(GameObject computer, string sceneName)
         {
             GameObject monitor = null;
+
+            if (sceneName == "GorillaTag" && !ZoneManagement.IsInZone(GTZone.monkeBlocks))
+            {
+                computer.transform.parent?.parent?.parent?.Find("FunctionSelect").gameObject?.SetActive(false);
+                computer.transform.parent?.parent?.parent?.Find("Data").gameObject?.SetActive(false);
+            }
+
             foreach (Transform child in computer.transform)
             {
                 if (child.name.StartsWith("monitor"))

@@ -110,7 +110,10 @@ namespace ComputerInterface.Views.GameSettings
                     Redraw();
                     break;
                 case EKeyboardKey.Option1:
-                    BaseGameInterface.Disconnect();
+                    if (NetworkSystem.Instance.InRoom)
+                    {
+                        BaseGameInterface.Disconnect();
+                    }
                     break;
                 default:
                     if (_textInputHandler.HandleKey(key))
