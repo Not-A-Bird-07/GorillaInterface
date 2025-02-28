@@ -360,17 +360,14 @@ namespace ComputerInterface
         // SetQueue, GetQueue, AllowedInCompetitive
         #region Queue settings
 
-        public static void SetQueue(IQueueInfo queue, bool isTroopQueue = false)
+        public static void SetQueue(IQueueInfo queue)
         {
             if (!CheckForComputer(out GorillaComputer computer)) return;
 
             if (queue.QueueName == "COMPETITIVE" && !AllowedInCompetitive()) return;
 
             GorillaComputer.instance.currentQueue = queue.QueueName;
-            computer.troopQueueActive = isTroopQueue;
-            computer.SetField("currentTroopPopulation", -1);
             PlayerPrefs.SetString("currentQueue", queue.QueueName);
-            PlayerPrefs.SetInt("troopQueueActive", computer.troopQueueActive ? 1 : 0);
             PlayerPrefs.Save();
         }
 
