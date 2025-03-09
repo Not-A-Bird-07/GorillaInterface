@@ -25,13 +25,13 @@
 			<HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp">
-		  <HintPath>..\..\..\..\..\..\..\..\Steam\steamapps\common\Gorilla Tag\Gorilla Tag_Data\Managed\Assembly-CSharp.dll</HintPath>
+		  <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx">
 			<HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
 		</Reference>
 		<Reference Include="Bepinject">
-			<HintPath>$(PluginsPath)\Core Mods\Bepinject\Bepinject.dll</HintPath>
+			<HintPath>$(PluginsPath)\Bepinject-Auros\Bepinject.dll</HintPath>
 		</Reference>
 		<Reference Include="Fusion.Runtime">
 		  <HintPath>$(GameAssemblyPath)\Fusion.Runtime.dll</HintPath>
@@ -82,10 +82,10 @@
 			<HintPath>$(GameAssemblyPath)\UnityEngine.UI.dll</HintPath>
 		</Reference>
 		<Reference Include="Zenject">
-			<HintPath>$(PluginsPath)\Core Mods\Extenject\Zenject.dll</HintPath>
+			<HintPath>$(PluginsPath)\Extenject\Zenject.dll</HintPath>
 		</Reference>
 		<Reference Include="Zenject-usage">
-			<HintPath>$(PluginsPath)\Core Mods\Extenject\Zenject-usage.dll</HintPath>
+			<HintPath>$(PluginsPath)\Extenject\Zenject-usage.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
