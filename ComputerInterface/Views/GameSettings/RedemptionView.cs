@@ -18,8 +18,8 @@ namespace ComputerInterface.Views.GameSettings
         public override void OnShow(object[] args)
         {
             base.OnShow(args);
-            _textInputHandler.Text = string.Empty;
 
+            _textInputHandler.Text = string.Empty;
             Redraw();
         }
 
@@ -99,7 +99,7 @@ namespace ComputerInterface.Views.GameSettings
                         BaseGameInterface.SetRedemptionStatus(GorillaComputer.RedemptionResult.Empty);
                     }
                     Redraw();
-                    await Task.Delay(600); // Wait 0.6 seconds for the computer to fully register the code inputted.
+                    await Task.Delay(600); // Wait 0.6 seconds for the computer to fully register the code inputted and show the correct state.
                     Redraw();
                     break;
                 case EKeyboardKey.Back:

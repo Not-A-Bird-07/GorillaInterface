@@ -114,6 +114,7 @@ namespace ComputerInterface
                 computer.currentName = name;
                 NetworkSystem.Instance.SetMyNickName(computer.currentName);
                 ModIOMapsTerminal.RequestDriverNickNameRefresh();
+                GorillaTagger.Instance.offlineVRRig.UpdateName();
 
                 computer.InvokeMethod("SetNameTagText", name);
 
@@ -377,7 +378,7 @@ namespace ComputerInterface
 
         #endregion
 
-        // InitColorState, InitNameState, InitTurnState, InitMicState, InitVoiceMode, InitItemMode, InitSupportMode, InitAll
+        // InitColorState, InitNameState, InitTurnState, InitMicState, InitVoiceMode, InitAutomodMode, InitItemMode, InitRedemptionStatus, InitSupportMode, InitAll
         #region Initialization
 
         public static void InitColorState()
@@ -433,7 +434,7 @@ namespace ComputerInterface
             displaySupportTab = false;
         }
 
-        public static void InitAll()
+        public static async void InitAll()
         {
             InitColorState();
             InitNameState();
@@ -447,6 +448,7 @@ namespace ComputerInterface
 
             if (CheckForComputer(out GorillaComputer computer))
             {
+                await Task.Delay(1); // Name State initializes a milisecond too quickly, in which causes an error. -DecalFree
                 computer.InvokeMethod("Start");
             }
         }
