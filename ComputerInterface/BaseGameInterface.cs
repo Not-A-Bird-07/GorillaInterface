@@ -448,7 +448,7 @@ namespace ComputerInterface
 
             if (CheckForComputer(out GorillaComputer computer))
             {
-                await Task.Delay(1); // Name State initializes a milisecond too quickly, in which causes an error. -DecalFree
+                await Task.Delay(1); // Name State initializes a millisecond too quickly, in which causes an error. -DecalFree
                 computer.InvokeMethod("Start");
             }
         }
