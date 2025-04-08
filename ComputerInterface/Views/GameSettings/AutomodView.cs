@@ -18,6 +18,7 @@ namespace ComputerInterface.Views.GameSettings
         public override void OnShow(object[] args)
         {
             base.OnShow(args);
+
             _selectionHandler.CurrentSelectionIndex = (int)BaseGameInterface.GetAutomodMode();
             Redraw();
         }

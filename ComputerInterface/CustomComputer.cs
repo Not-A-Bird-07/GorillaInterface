@@ -99,7 +99,8 @@ namespace ComputerInterface
                 { "Bayou", "BayouMain/ComputerArea/GorillaComputerObject/ComputerUI" },
                 { "Cave", "Cave_Main_Prefab/NewCave/CaveComputer/GorillaComputerObject/ComputerUI" },
                 { "Arena", "ArenaComputerRoom/UI/GorillaComputerObject/ComputerUI" },
-                { "Hoverboard", "HoverboardLevel/UI (1)/GorillaComputerObject/ComputerUI" }
+                { "Hoverboard", "HoverboardLevel/UI (1)/GorillaComputerObject/ComputerUI" },
+                { "Critters", "Critters/UI Elements/UI/GorillaComputerObject/ComputerUI" }
             };
             PrepareMonitor(SceneManager.GetActiveScene(), _computerPathDictionary["GorillaTag"]);
 
