@@ -393,6 +393,7 @@ namespace ComputerInterface
         {
             string name = PlayerPrefs.GetString("playerName", "gorilla");
             SetName(name);
+            GorillaTagger.Instance.offlineVRRig.UpdateName();
         }
 
         public static void InitTurnState()
