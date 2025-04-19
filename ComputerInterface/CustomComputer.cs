@@ -33,8 +33,6 @@ namespace ComputerInterface
 
         private readonly List<CustomScreenInfo> _customScreenInfos = new();
 
-        private Dictionary<string, string> _computerPathDictionary;
-
         private List<CustomKeyboardKey> _keys;
 
         private readonly Mesh CubeMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
@@ -86,23 +84,7 @@ namespace ComputerInterface
             _computerViewController.OnTextChanged += SetText;
             _computerViewController.OnSwitchView += SwitchView;
             _computerViewController.OnSetBackground += SetBGImage;
-
-            _computerPathDictionary = new()
-            {
-                { "GorillaTag", "Environment Objects/LocalObjects_Prefab/TreeRoom/TreeRoomInteractables/GorillaComputerObject/ComputerUI" },
-                { "Mountain", "Mountain/Geometry/goodigloo/GorillaComputerObject/ComputerUI" },
-                { "Skyjungle", "skyjungle/UI/GorillaComputerObject/ComputerUI" },
-                { "Basement", "Basement/DungeonRoomAnchor/BasementComputer/GorillaComputerObject/ComputerUI" },
-                { "Beach", "Beach/BeachComputer (1)/GorillaComputerObject/ComputerUI" },
-                { "Rotating", "RotatingPermanentEntrance/UI (1)/GorillaComputerObject/ComputerUI" },
-                { "Metropolis", "MetroMain/ComputerArea/GorillaComputerObject/ComputerUI" },
-                { "Bayou", "BayouMain/ComputerArea/GorillaComputerObject/ComputerUI" },
-                { "Cave", "Cave_Main_Prefab/NewCave/CaveComputer/GorillaComputerObject/ComputerUI" },
-                { "Arena", "ArenaComputerRoom/UI/GorillaComputerObject/ComputerUI" },
-                { "Hoverboard", "HoverboardLevel/UI (1)/GorillaComputerObject/ComputerUI" },
-                { "Critters", "Critters/UI Elements/UI/GorillaComputerObject/ComputerUI" }
-            };
-            PrepareMonitor(SceneManager.GetActiveScene(), _computerPathDictionary["GorillaTag"]);
+            PrepareMonitor(SceneManager.GetActiveScene(), SceneManager.GetActiveScene().GetComponentInHierarchy<GorillaComputerTerminal>().gameObject.transform.GetChild(0).GetPath());
 
             _clickSound = await _assetsLoader.GetAsset<AudioClip>("ClickSound");
 
@@ -175,18 +157,15 @@ namespace ComputerInterface
         {
             string sceneName = scene.name;
 
-            if (loadMode == LoadSceneMode.Additive && _computerPathDictionary.TryGetValue(sceneName, out string computerPath))
+            if (loadMode == LoadSceneMode.Additive)
             {
-                PrepareMonitor(scene, string.IsNullOrEmpty(computerPath) ? scene.GetComponentInHierarchy<GorillaComputerTerminal>(true).gameObject.GetPath()[1..] : computerPath);
+                if(ZoneManagement.IsInZone(GTZone.monkeBlocks))
+                    PrepareMonitor(SceneManager.GetSceneByName("GorillaTag"), "Environment Objects/MonkeBlocksRoomPersistent/MonkeBlocksComputer/GorillaComputerObject/ComputerUI");
+                else
+                    PrepareMonitor(scene, scene.GetComponentInHierarchy<GorillaComputerTerminal>().gameObject.transform.GetChild(0).GetPath());
 
                 if (sceneName == "Cave")
-                {
                     PrepareMonitor(scene, "Cave_Main_Prefab/OldCave/MinesComputer/GorillaComputerObject/ComputerUI");
-                }
-            }
-            else if (loadMode == LoadSceneMode.Additive && ZoneManagement.IsInZone(GTZone.monkeBlocks))
-            {
-                PrepareMonitor(SceneManager.GetSceneByName("GorillaTag"), "Environment Objects/MonkeBlocksRoomPersistent/MonkeBlocksComputer/GorillaComputerObject/ComputerUI");
             }
         }
 
