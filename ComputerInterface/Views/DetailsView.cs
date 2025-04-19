@@ -32,7 +32,7 @@ namespace ComputerInterface.Views
         {
             _name = BaseGameInterface.GetName();
             _roomCode = BaseGameInterface.GetRoomCode();
-            _playerCount = PhotonNetworkController.Instance.TotalUsers();
+            _playerCount = NetworkSystem.Instance.GlobalPlayerCount();
             _playerBans = GorillaComputer.instance.GetField<int>("usersBanned");
         }
 
