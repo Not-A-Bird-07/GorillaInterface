@@ -113,7 +113,7 @@ namespace ComputerInterface
 
                 computer.currentName = name;
                 NetworkSystem.Instance.SetMyNickName(computer.currentName);
-                ModIOMapsTerminal.RequestDriverNickNameRefresh();
+                CustomMapsTerminal.RequestDriverNickNameRefresh();
                 GorillaTagger.Instance.offlineVRRig.UpdateName();
 
                 computer.InvokeMethod("SetNameTagText", name);
