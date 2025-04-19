@@ -8,7 +8,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyToPlugins" AfterTargets="Build">
-		<Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(PluginsPath)\ToniMacaroni's Mods\$(ProjectName)\" />
+		<Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(PluginsPath)\CI\" />
 		<Message Text="Copied to Plugins" Importance="high" />
 	</Target>
 
