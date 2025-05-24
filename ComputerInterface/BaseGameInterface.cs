@@ -116,7 +116,7 @@ namespace ComputerInterface
                 CustomMapsTerminal.RequestDriverNickNameRefresh();
                 GorillaTagger.Instance.offlineVRRig.UpdateName();
 
-                computer.InvokeMethod("SetNameTagText", name);
+                computer.SetLocalNameTagText(name);
 
                 computer.savedName = name;
                 PlayerPrefs.SetString("playerName", name);
