@@ -161,6 +161,8 @@ namespace ComputerInterface
             {
                 if(ZoneManagement.IsInZone(GTZone.monkeBlocks))
                     PrepareMonitor(SceneManager.GetSceneByName("GorillaTag"), "Environment Objects/MonkeBlocksRoomPersistent/MonkeBlocksComputer/GorillaComputerObject/ComputerUI");
+                else if (ZoneManagement.IsInZone(GTZone.monkeBlocksShared))
+                    PrepareMonitor(SceneManager.GetSceneByName("GorillaTag"), "Environment Objects/LocalObjects_Prefab/SharedBlocksMapSelectLobby/GorillaComputerObject/ComputerUI");
                 else
                     PrepareMonitor(scene, scene.GetComponentInHierarchy<GorillaComputerTerminal>().gameObject.transform.GetChild(0).GetPath());
 
@@ -443,7 +445,8 @@ namespace ComputerInterface
         {
             GameObject monitor = null;
 
-            if (sceneName == "GorillaTag" && !ZoneManagement.IsInZone(GTZone.monkeBlocks))
+            // Important ASS if statement
+            if (sceneName == "GorillaTag" && !ZoneManagement.IsInZone(GTZone.monkeBlocks) && !ZoneManagement.IsInZone(GTZone.monkeBlocksShared))
             {
                 computer.transform.parent?.parent?.parent?.Find("FunctionSelect").gameObject?.SetActive(false);
                 computer.transform.parent?.parent?.parent?.Find("Data").gameObject?.SetActive(false);
