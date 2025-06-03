@@ -178,12 +178,7 @@ namespace ComputerInterface
             if (!CheckForComputer(out GorillaComputer computer)) return;
 
             string turnModeString = turnMode.ToString().ToUpper();
-            computer.SetField("turnType", turnModeString);
-
-            PlayerPrefs.SetString("stickTurning", turnModeString);
-            PlayerPrefs.Save();
-
-            GorillaTagger.Instance.GetComponent<GorillaSnapTurn>().ChangeTurnMode(turnModeString, computer.GetField<int>("turnValue"));
+            GorillaSnapTurn.UpdateAndSaveTurnType(turnModeString);
         }
 
         public static ETurnMode GetTurnMode()
@@ -197,10 +192,7 @@ namespace ComputerInterface
         {
             if (!CheckForComputer(out GorillaComputer computer)) return;
 
-            computer.SetField("turnValue", value);
-            PlayerPrefs.SetInt("turnFactor", value);
-            PlayerPrefs.Save();
-            GorillaTagger.Instance.GetComponent<GorillaSnapTurn>().ChangeTurnMode(computer.GetField<string>("turnType"), value);
+            GorillaSnapTurn.UpdateAndSaveTurnFactor(value);
         }
 
         public static int GetTurnValue() => PlayerPrefs.GetInt("turnFactor", 4);
