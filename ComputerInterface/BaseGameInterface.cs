@@ -427,7 +427,7 @@ namespace ComputerInterface
             displaySupportTab = false;
         }
 
-        public static async void InitAll()
+        public static void InitAll()
         {
             InitColorState();
             InitNameState();
@@ -441,7 +441,6 @@ namespace ComputerInterface
 
             if (CheckForComputer(out GorillaComputer computer))
             {
-                await Task.Delay(1); // Name State initializes a millisecond too quick, in which causes an error. -DecalFree
                 computer.InvokeMethod("Start");
             }
         }
