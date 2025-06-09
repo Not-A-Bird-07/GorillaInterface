@@ -25,20 +25,12 @@ namespace ComputerInterface.Views.GameSettings
         {
             base.OnShow(args);
 
-            string prefsQueue = BaseGameInterface.GetQueue();
+            var prefsQueue = BaseGameInterface.GetQueue();
 
-            //if the pref does not equal the builtin game ones it breaks the view so this fixes it
+            var queue = _queues.FirstOrDefault(q => q.DisplayName.ToLower() == prefsQueue.ToLower()) ??
+                        _queues.FirstOrDefault(q => q.DisplayName == "Default");
 
-            for (int i = 0; i < _queues.Count; i++)
-            {
-                if (_queues[i].DisplayName != prefsQueue)
-                {
-                    prefsQueue = "Default";
-                    BaseGameInterface.SetQueue(_queues[0]);
-                }
-            }
-
-            _selectionHandler.CurrentSelectionIndex = _queues.IndexOf(_queues.First(queue => queue.DisplayName == prefsQueue));
+            _selectionHandler.CurrentSelectionIndex = _queues.IndexOf(queue);
             BaseGameInterface.SetQueue(_queues[_selectionHandler.CurrentSelectionIndex]);
 
             Redraw();
